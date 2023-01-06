@@ -1,0 +1,241 @@
+server {
+        #listen 443;
+        #server_name tx.yunjinginc.com;
+
+        listen 8060;
+        client_max_body_size 20M;
+
+        access_log  /var/log/nginx/yami2/access_https_2.log;
+        error_log   /var/log/nginx/yami2/error_https_2.log;
+
+        root html;
+        index index.html index.htm;
+
+        gzip on;
+        gzip_min_length 1k;
+        gzip_buffers 4 16k;
+        gzip_comp_level 5;
+        gzip_types text/plain application/x-javascript text/css application/xml text/javascript application/javascript image/jpeg image/gif image/png application/json application/octet-stream;
+        gzip_vary off;
+        gzip_disable "MSIE [1-6]\.";
+
+        #ssl on;
+        #ssl_certificate /etc/nginx/certificate/2019_1_tx.yunjinginc.com_bundle.crt;
+        #ssl_certificate_key /etc/nginx/certificate/2019_2_tx.yunjinginc.com.key;
+
+        #ssl_session_cache shared:SSL:20m;
+        #ssl_session_timeout 60m;
+
+        #ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        #ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+        #ssl_prefer_server_ciphers on;
+
+	location /yami_map_editor {
+            proxy_pass http://123.206.6.59:8076/yami_map_editor;
+        }
+	location /yami_tools {
+            proxy_pass http://123.206.6.59:8076/yami_tools;
+        }
+	location /yami_tools/report_error {
+            proxy_pass http://123.206.6.59:8076/report_error;
+        }
+	location /yami_admin {
+            keepalive_timeout 600;
+            proxy_read_timeout 600;
+            proxy_pass http://127.0.0.1:8076/yami_admin;
+        }
+	location /yunjing_map_editor {
+            proxy_pass http://127.0.0.1:8076/yunjing_map_editor;
+        }
+
+	location /.well-known/pki-validation/fileauth.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/fileauth.txt;
+        }
+
+	location /yunjing_kpi {
+            proxy_pass http://127.0.0.1:8200;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+	 location /oa/ {
+            autoindex on;
+            alias /home/yunjing/Documents/110_oa/;
+         }
+
+        location /yunjing_game {
+            proxy_pass http://127.0.0.1:8200;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        location /yunjing_game_car {
+            proxy_pass http://127.0.0.1:8200;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+	}
+	location /api {
+            proxy_pass http://127.0.0.1:8033;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+	location /fus {
+            proxy_pass http://127.0.0.1:8042;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        location /hongyuan {
+            alias /home/yunjing/Documents/530hongyuanWeChat;
+        }
+	location /static {
+            autoindex off;
+            alias /home/yunjing/Documents/510YamiAPI/static;
+        }
+	location /geo_json/ {
+            autoindex off;
+            alias /home/yunjing/Documents/geo_json/;
+        }
+        location /wechatdev {
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index indexWeChat.html;
+            alias /home/yunjing/Documents/520YamiWeChat/WeChat/webappDev;
+        }
+        location /wechatexp {
+            #return 301  https://yami2.yunjinginc.com/wechatpro/congrong/#/index?bdgId=552;
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index index.html;
+            alias /home/yunjing/Documents/520YamiWeChat/WeChat/webappExp;
+        }
+        location /wechatpro {
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index index.html;
+            alias /home/yunjing/Documents/520YamiWeChat/WeChat/webappPro;
+        }
+        location /beaconinfo {
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index index.html;
+            alias /home/yunjing/Documents/520YamiWeChat/inodeBitmapDev;
+        }
+        location /wechat {
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index indexWeChat.html;
+            alias /home/yunjing/Documents/520YamiWeChat/WeChat/webapp;
+        }
+
+        location /miniapp {
+            add_header Cache-Control max-age=300;
+            autoindex off;
+            index indexProgram.html;
+            alias /home/yunjing/Documents/520YamiWeChat/program;
+        }
+
+	location /MP_verify_sKE7iWGTdLInSJ8M.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/MP_verify_sKE7iWGTdLInSJ8M.txt;
+        }
+	location /MP_verify_fCwCnQ3HhIyfc0Ue.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/MP_verify_fCwCnQ3HhIyfc0Ue.txt;
+        }
+	location /MP_verify_81QjFSh9rgjvL4G2.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/MP_verify_81QjFSh9rgjvL4G2.txt;
+        }
+	location /MP_verify_LqVpnqIwVkmmJvtV.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/MP_verify_LqVpnqIwVkmmJvtV.txt;
+        }
+	location /MP_verify_hcVSVVdvW5W0TGf6.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/MP_verify_hcVSVVdvW5W0TGf6.txt;
+        }
+
+	# 亚米检查工具配置
+	location /96oEYuLqhr.txt {
+            autoindex off;
+            alias /home/yunjing/Documents/wx_verify/96oEYuLqhr.txt;
+        }
+	# 宝鸡中心医院548测试验证
+	location /4W8guWmlCX.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/wx_verify/4W8guWmlCX.txt;
+        }
+	# 测试环境二维码配置
+	location /ym/UU2sNJHgnm.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/wx_verify/UU2sNJHgnm.txt;
+        }
+	location /dev/UU2sNJHgnm.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/wx_verify/UU2sNJHgnm.txt;
+        }
+	# 线上二维码配置
+        location /qrcode/info/57QSQ1Jjkp.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/510YamiAPI/wechat_verify/57QSQ1Jjkp.txt;
+        }
+        location /57QSQ1Jjkp.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/510YamiAPI/wechat_verify/57QSQ1Jjkp.txt;
+        }
+        location /5288433422.txt {
+            autoindex off;
+            alias /home/ubuntu/Documents/510YamiAPI/wechat_verify/5288433422.txt;
+        }
+	# 空港
+        location /kgxc/h5/ {
+            autoindex off;
+            alias /home/ubuntu/Documents/kgxc-door/h5/;
+        }
+	# 光环商场
+        location /ghe {
+            proxy_pass http://127.0.0.1:8686/ghe;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        location /ghf {
+            proxy_pass http://127.0.0.1:8686/ghf;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        location /ghuan/media {
+            add_header Cache-Control max-age=60*60*24;
+            autoindex off;
+            alias /home/yunjing/Documents/920guanghuan/media;
+        }
+        location /ghuan/home {
+            autoindex off;
+            index index.html;
+            alias /home/yunjing/Documents/922guanghuan_front/output;
+        }
+}
+
+server {
+        listen 80;
+        server_name tx.yunjinginc.com 123.206.6.59;
+
+        access_log  /var/log/nginx/yami2/access_http.log;
+        error_log   /var/log/nginx/yami2/error_http.log;
+
+        location ^~ /geoserver {
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8080/geoserver;
+        }
+
+        location / {
+            return 301  https://$host$request_uri;
+        }
+}

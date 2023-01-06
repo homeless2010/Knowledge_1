@@ -1,0 +1,24 @@
+#upstream app_server {
+ #   server 127.0.0.1:8081 fail_timeout=0;
+#}
+#server {
+#    listen 80;
+#    server_name ci.yunjinginc.com;
+#    rewrite ^ https://$server_name$request_uri? permanent;
+#}
+
+server {
+    listen 80;
+    server_name t.pets.yunjinginc.com;
+    location / {
+        autoindex on;
+        root /home/pets/www/pets;
+        location ~ "\.txt$"{
+            allow all;
+            }
+#        uwsgi_pass pets_uwsgi;
+        include  /etc/nginx/uwsgi_params;
+        uwsgi_read_timeout 200s;
+        uwsgi_send_timeout 120s;
+        }
+}

@@ -1,0 +1,11 @@
+docker run -d --name seata -p 8091:8091 -e SEATA_IP=172.21.141.94 -e STORE_MODE=db -e SEATA_CONFIG_NAME=file:/root/seata-config/registry -v /opt/ry-cloud/seata-config:/root/seata-config seataio/seata-server:latest
+
+
+
+docker run -d --name seata -p 8091:8091 -e SEATA_IP=172.21.141.94 -e STORE_MODE=db -e SEATA_CONFIG_NAME=file:/root/seata-config/registry -v /opt/ry-cloud/seata-config:/root/seata-config seataio/seata-server:latest
+
+
+
+
+
+docker run -d --name seata --network=host -p 8091:8091 -e STORE_MODE=db -e SEATA_CONFIG_NAME=file:/root/seata-config/registry -v /root/seata-config:/root/seata-config seataio/seata-server:1.4.0

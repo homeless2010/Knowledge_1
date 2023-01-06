@@ -1,0 +1,64 @@
+version: '3'
+services:
+  mysql57:
+    image: mysql:5.7
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    command:
+      --character-set-server=utf8
+      --collation-server=utf8_general_ci
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/data:/var/lib/mysql
+      - ./db/init-sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: YJ89385902
+    restart: always
+    network_mode: "host"
+  smart-track:
+    build:
+      context: backend 
+      dockerfile: Dockerfile
+    container_name: smart-track
+    ports:
+      - "8094:8094"
+    volumes:
+      - ./backend/config:/config
+      - ./backend/uploadPath:/uploadPath
+      - ./backend/logs:/logs
+      - ./backend/backup:/backup
+      - /etc/localtime:/etc/localtime
+    environment:
+      - TZ=Asia/Shanghai
+    depends_on:
+      - redis
+      - mysql57
+    restart: always
+    network_mode: "host"
+  redis:
+    image: redis:6.2.1
+    container_name: redis
+    command: redis-server --requirepass YJ89385902
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    restart: always
+    network_mode: "host"
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    privileged: true
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "80:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/logs:/var/logs/nginx
+      - ./smart_track_fe:/usr/share/nginx/html
+    restart: always
+    network_mode: "host"

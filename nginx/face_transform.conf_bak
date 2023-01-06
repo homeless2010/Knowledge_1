@@ -1,0 +1,73 @@
+##
+# You should look at the following URL's in order to grasp a solid understanding
+# of Nginx configuration files in order to fully unleash the power of Nginx.
+# http://wiki.nginx.org/Pitfalls
+# http://wiki.nginx.org/QuickStart
+# http://wiki.nginx.org/Configuration
+#
+# Generally, you will want to move this file somewhere, and start with a clean
+# file but keep this around for reference. Or just disable in sites-enabled.
+#
+# Please see /usr/share/doc/nginx-doc/examples/ for more detailed examples.
+##
+
+# Default server configuration
+#
+server {
+        listen 443;
+        server_name starbucks.yunjinginc.com;
+
+        access_log  /var/log/nginx/access_face.log;
+        error_log   /var/log/nginx/error_face.log;
+
+        root html;
+        index index.html index.htm;
+
+        gzip on;
+        gzip_min_length 1k;
+        gzip_buffers 4 16k;
+        gzip_comp_level 2;
+        gzip_types text/plain application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png application/json;
+        gzip_vary off;
+        gzip_disable "MSIE [1-6]\.";
+
+        ssl on;
+        ssl_certificate /root/www/cert_no/starbucks.yunjinginc.com.pem;
+        ssl_certificate_key /root/www/cert_no/starbucks.yunjinginc.com.key;
+
+        ssl_session_cache shared:SSL:20m;
+        ssl_session_timeout 60m;
+
+        ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+        ssl_prefer_server_ciphers on;
+
+        location /api {
+            proxy_pass http://127.0.0.1:8055/api;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        #location / {
+        #    autoindex off;
+        #    return 301  https://$host/qjweb/login.html;
+        #}
+
+        #location /qjweb {
+        #    autoindex off;
+        #    alias /home/brian/710qujiang_echeck/frontend_admin/qjtravel;
+        #}
+}
+
+server {
+        listen 80;
+        server_name echeck.yunjinginc.com;
+
+        access_log  /var/log/nginx/access_face_http.log;
+        error_log   /var/log/nginx/error_face_http.log;
+
+        location / {
+            return 301  https://$host$request_uri;
+        }
+}
+

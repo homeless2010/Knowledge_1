@@ -1,0 +1,102 @@
+version : '3.9'
+services:
+  mysql8:
+    image: mysql:8.0
+    container_name: mysql8
+    ports:
+      - "7000:3306"
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init-sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: STEPelectricMysql
+      MYSQL_DATABASE: step_iot
+      MYSQL_USER: step_iot
+      MYSQL_PASSWORD: iot2021
+    restart: always
+  tdengine:
+    image: tdengine/tdengine:3.0.1.8
+    container_name: step-iot-tdengine
+    hostname: tdengine
+    ports:
+      - "6030-6049:6030-6049"	 
+      - "6030-6049:6030-6049/udp"
+    volumes:
+      - ./tdengine/etc:/etc/taos
+      - ./tdengine/data:/var/lib/taos
+      - ./tdengine/log:/var/log/taos 
+    environment:
+      - TAOS_FQDN=tdengine
+    restart: always
+  redis:
+    image: redis:7.0.5
+    container_name: redis
+    command: redis-server --requirepass STEPelectricRedis
+    ports:
+      - "7001:6379"
+    volumes:
+      - ./redis/data:/data
+    restart: always
+  step-iot-front:
+    image: nginx:1.22.1
+    container_name: step-iot-front
+    privileged: true 
+    environment:
+      - TZ=Asia/Shanghai
+      - env="prod"
+    command: /bin/sh -c "sed -i "s/vueEnv.active/\"$${env}\"/g" /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./nginx/logs:/var/logs/nginx
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./step-iot-front:/usr/share/nginx/html
+    restart: always
+  step-iot-back:
+    build:
+      context: step-iot-back 
+      dockerfile: Dockerfile
+    image: step-iot-back-prod:1.0.0
+    container_name: step-iot-back
+    ports:
+      - "7141:7510"
+      - "7143:1883"
+      - "7144:1884"
+    volumes:
+      - ./step-iot-back/config:/config
+      - ./step-iot-back/logs:/my-app/logs
+      - /etc/localtime:/etc/localtime
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=prod
+#    extra_hosts:
+    depends_on:
+      - redis
+      - mysql8
+      - tdengine
+      - minio
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "2.00"
+          memory: 6G
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server --console-address ':9001' /data 
+    ports:
+      - "7040:9000"
+      - "7041:9001"
+    volumes:
+      - ./minio/data:/data
+      - ./minio/config:/root/.minio
+    environment:
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: step2022

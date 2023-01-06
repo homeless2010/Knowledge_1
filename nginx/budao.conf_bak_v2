@@ -1,0 +1,83 @@
+upstream app_budao_server {
+    server 127.0.0.1:8200 fail_timeout=0;
+}
+
+# configuration of the server
+server {
+     listen 443;
+     listen 80;
+     server_name xaqujiangchi.cn www.xaqujiangchi.cn;
+     ssl on;
+     ssl_certificate   /root/www/cert_no/3915315_xaqujiangchi.cn.pem;
+     ssl_certificate_key  /root/www/cert_no/3915315_xaqujiangchi.cn.key;
+     ssl_session_timeout 5m;
+     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+     ssl_prefer_server_ciphers on;
+
+     ssl_stapling on;
+     ssl_stapling_verify on;
+
+     root html;
+     index index.html index.htm;
+
+     charset     utf-8;
+     send_timeout 120s;
+
+     access_log  /var/log/nginx/budao/access.log;
+     error_log   /var/log/nginx/budao/error.log;
+
+     # max upload size
+     client_max_body_size 20m;   # adjust to taste
+     # Django media
+     #location /media  {
+     #      alias /home/brian/www/travel/media;
+     # }
+
+    # Finally, send all non-media requests to the Django server.
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        if (!-f $request_filename) {
+            proxy_pass http://app_budao_server;
+            break;
+        }
+    }
+    # fe
+    location /index/ {
+        autoindex on;
+        alias /root/www/budao_index/;
+    }
+    # fe admin
+    location /website_admin/ {
+        autoindex on;
+        alias /root/www/budao_websit_admin/;
+    }
+
+    location /map/ {
+        autoindex on;
+        alias /root/www/budao_map/;
+    }
+
+    location /minprogram_admin/ {
+        autoindex on;
+        alias /root/www/budao_minprogram_admin/;
+    }
+    
+    location /static/ {
+        autoindex on;
+        alias /root/www/budao/static/;
+    }
+    location /MP_verify_4co9nH9HRSLvJMmL.txt {
+         autoindex on;
+         #alias /root/www/Coronavirus/cert/MP_verify_4co9nH9HRSLvJMmL.txt;
+         alias /root/www/wei_xin_txt/MP_verify_4co9nH9HRSLvJMmL.txt;
+    }
+    location /MP_verify_N5NQnhsmV2g3ojaR.txt {
+         autoindex on;
+         alias /root/www/wei_xin_txt/MP_verify_N5NQnhsmV2g3ojaR.txt;
+    }
+}

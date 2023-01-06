@@ -1,0 +1,116 @@
+  location / {
+            autoindex off;
+            index index.html;
+            root /home/brian/933yibiaotong_fe;
+            #try_files $uri $uri/ /index.html;
+            #index  index.html index.htm;
+            #root /home/ubuntu/Documents/933yibiaotong_fe;
+        }
+        location ~ ^(\/ybt\/prod-api\/|\/casLogin$|\/ybt$|\/logout$|\/) {
+			if ($request_uri ~ \/ybt\/prod-api\/){
+				rewrite ^\/ybt\/prod-api\/(.*)$ /$1 break;
+				proxy_pass http://localhost:8093;
+				break;
+			}
+			#\/ybt$ or \/ybt
+			if ($request_uri ~ casLogin|\/ybt$|logout){
+				rewrite ^\/(.*)$ /$1 break;
+				proxy_pass http://localhost:8093;
+			}
+			autoindex off;
+            index index.html;
+            root /home/brian/933yibiaotong_fe;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            #proxy_pass http://localhost:8093;
+        }
+		
+		#修正版
+		location ~ ^(\/ybt\/prod-api\/|\/casLogin$|\/ybt$|\/logout$|\/) {
+
+            if ($request_uri ~ \/ybt\/prod-api\/){
+                rewrite ^\/ybt\/prod-api\/(.*)$ /$1 break;
+                proxy_pass http://localhost:8093;
+                break;
+            }
+            if ($request_uri ~ ^/casLogin$|^/ybt\?ticket|^/logout$){
+                rewrite ^\/(.*)$ /$1 break;
+                proxy_pass http://localhost:8093;
+                break;
+            }
+            autoindex off;
+            index index.html;
+            root /home/brian/933yibiaotong_fe;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            #proxy_pass http://localhost:8093;
+        }
+		
+		
+        location /casLogin {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/casLogin;
+        }
+        location /ybt {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/ybt;
+        }
+        location /logout {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/logout;
+			
+			
+			
+			
+			
+			 #######  一表通项目 Begin ######
+        location / {
+            autoindex off;
+            index index.html;
+            root /home/brian/933yibiaotong_fe;
+            #try_files $uri $uri/ /index.html;
+            #index  index.html index.htm;
+            #root /home/ubuntu/Documents/933yibiaotong_fe;
+        }
+        location /ybt/prod-api/ {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/;
+        }
+        location /casLogin {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/casLogin;
+        }
+        location /ybt {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/ybt;
+        }
+        location /logout {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8093/logout;
+        }
+        #######  一表通项目 End  ######

@@ -1,0 +1,1 @@
+docker run --name kibana -d --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://elastic:9200" -e "I18N_LOCALE=zh-CN" docker.elastic.co/kibana/kibana:7.13.2
